@@ -15,17 +15,15 @@ namespace BashSoft
             ////Data.GetAllStudentsFromCourse("Unity");
             //Data.GetStudentScoresFromCourse("Unity", "Ivan");
 
-            Tester.CompareContent(@"d\test1.txt", @"d\test2.txt");
+            //Tester.CompareContent(@"D:\test1.txt", @"D:\test2.txt");
 
-            //IOManager.CreateDirectoryInCurrentFolder("pesho");
+            //IOManager.CreateDirectoryInCurrentFolder("*2");
             //IOManager.TraverseDirectory(0);
 
-            string inputPath = @"C:\Users\DonchoP\Documents\Visual Studio 2015\
-                            Projects\AdvancedCSharp\BashSoft\BashSoft\bin\Debug\input";
-            string myOutputPath = @"C:\Users\DonchoP\Documents\Visual Studio 2015\
-                            Projects\AdvancedCSharp\BashSoft\BashSoft\bin\Debug\myOutput";
-            string expectedOutputPath = @"C:\Users\DonchoP\Documents\Visual Studio 2015\
-                            Projects\AdvancedCSharp\BashSoft\BashSoft\bin\Debug\expectedOutput";
+            //IOManager.ChangeCurrentDirectoryAbsolute(@"C:\Windows");
+            //IOManager.TraverseDirectory(20);
+
+            InputReader.StartReadingCommands();
         }
     }
 }
