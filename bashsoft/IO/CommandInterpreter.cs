@@ -1,31 +1,14 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BashSoft
 {
-    public class InputReader
+    public static class CommandInterpreter
     {
-        private const string endCommand = "quit";
-
-        public static void StartReadingCommands()
-        {
-            OutputWriter.WriteMessage($"{SesionData.currentPath}> ");
-            string input = Console.ReadLine(); // Write command
-            input = input.Trim();
-
-            while (input != endCommand)
-            {
-                InterpredCommand(input); //Interpred Command
-                OutputWriter.WriteMessage($"{SesionData.currentPath}> ");
-                input = Console.ReadLine(); // Write command
-                input = input.Trim();
-            }
-        }
-
         public static void InterpredCommand(string input)
         {
             string[] data = input.Split(' ');
@@ -60,23 +43,139 @@ namespace BashSoft
                     TryShowWantedData(input, data);
                     break;
                 case "filter":
-                    //TODO
+                    TryFilterAndTake(input, data);
                     break;
                 case "order":
-                    //TODO
+                    TryOrderAndTake(input, data);
                     break;
                 case "decOrder":
                     //TODO
                     break;
                 case "download":
-                    //TODO
+                    TryDownloadRequestedFile(input, data);
                     break;
-                case "downloadAsynch":
-                    //TODO
+                case "downloadAsync":
+                    TryDownloadRequestedFileAsync(input, data);
                     break;
                 default:
                     DisplayInvalidCommandMessage(input);
                     break;
+            }
+        }
+
+        private static void TryDownloadRequestedFileAsync(string input, string[] data)
+        {
+            if (data.Length == 2)
+            {
+                string url = data[1];
+                DownloadManager.DownloadAsync(url);
+            }
+            else
+            {
+                DisplayInvalidCommandMessage(input);
+            }
+        }
+
+        private static void TryDownloadRequestedFile(string input, string[] data)
+        {
+            if (data.Length == 2)
+            {
+                string url = data[1];
+                DownloadManager.Download(url);
+            }
+            else
+            {
+                DisplayInvalidCommandMessage(input);
+            }
+        }
+
+        private static void TryOrderAndTake(string input, string[] data)
+        {
+            if (data.Length == 5)
+            {
+                string courseName = data[1];
+                string filter = data[2].ToLower();
+                string takeCommand = data[3].ToLower();
+                string takeQuantity = data[4].ToLower();
+
+                TryParseParametersForOrderAndTake(takeCommand, takeQuantity, courseName, filter);
+            }
+            else
+            {
+                DisplayInvalidCommandMessage(input);
+            }
+        }
+
+        private static void TryFilterAndTake(string input, string[] data)
+        {
+            if (data.Length == 5)
+            {
+                string courseName = data[1];
+                string filter = data[2].ToLower();
+                string takeCommand = data[3].ToLower();
+                string takeQuantity = data[4].ToLower();
+
+                TryParseParametersForFilterAndTake(takeCommand, takeQuantity, courseName, filter);
+            }
+            else
+            {
+                DisplayInvalidCommandMessage(input);
+            }
+        }
+
+        private static void TryParseParametersForFilterAndTake(string takeCommand, string takeQuantity, string courseName, string filter)
+        {
+            if (takeCommand == "take")
+            {
+                if (takeQuantity == "all")
+                {
+                    StudentsRepository.FilterAndTake(courseName, filter);
+                }
+                else
+                {
+                    int studentsToTake;
+                    bool hasParsed = int.TryParse(takeQuantity, out studentsToTake);
+                    if (hasParsed)
+                    {
+                        StudentsRepository.FilterAndTake(courseName, filter, studentsToTake);
+                    }
+                    else
+                    {
+                        OutputWriter.DisplayException(ExceptionMessages.InvalidTakeQuantityParameter);
+                    }
+                }
+            }
+            else
+            {
+                OutputWriter.DisplayException(ExceptionMessages.InvalidTakeCommand);
+            }
+        }
+
+        private static void TryParseParametersForOrderAndTake(string takeCommand, string takeQuantity, string courseName, string filter)
+        {
+            if (takeCommand == "take")
+            {
+                if (takeQuantity == "all")
+                {
+                    StudentsRepository.OrderAndTake(courseName, filter);
+                }
+                else
+                {
+                    int studentsToTake;
+                    bool hasParsed = int.TryParse(takeQuantity, out studentsToTake);
+                    if (hasParsed)
+                    {
+                        StudentsRepository.OrderAndTake(courseName, filter, studentsToTake);
+                    }
+                    else
+                    {
+                        OutputWriter.DisplayException(ExceptionMessages.InvalidTakeQuantityParameter);
+                    }
+                }
+            }
+            else
+            {
+                OutputWriter.DisplayException(ExceptionMessages.InvalidTakeCommand);
             }
         }
 
@@ -85,13 +184,13 @@ namespace BashSoft
             if (data.Length == 2)
             {
                 string courseName = data[1];
-                Data.GetAllStudentsFromCourse(courseName);
+                StudentsRepository.GetAllStudentsFromCourse(courseName);
             }
             else if (data.Length == 3)
             {
                 string courseName = data[1];
                 string studentName = data[2];
-                Data.GetStudentScoresFromCourse(courseName, studentName);
+                StudentsRepository.GetStudentScoresFromCourse(courseName, studentName);
             }
             else
             {
@@ -119,10 +218,10 @@ namespace BashSoft
 
         private static void TryReadDatabaseFromFile(string input, string[] data)
         {
-            if(data.Length == 2)
+            if (data.Length == 2)
             {
                 string fileName = data[1];
-                Data.InitializeData(fileName);
+                StudentsRepository.InitializeData(fileName);
             }
             else
             {
@@ -145,8 +244,8 @@ namespace BashSoft
 
         private static void TryChangePathRelatively(string input, string[] data)
         {
-            if(data.Length == 2)
-            { 
+            if (data.Length == 2)
+            {
                 string relPath = data[1];
                 IOManager.ChangeCurrentDirectoryRelative(relPath);
             }
@@ -158,7 +257,7 @@ namespace BashSoft
 
         private static void TryCompareFiles(string input, string[] data)
         {
-            if(data.Length == 3)
+            if (data.Length == 3)
             {
                 string firstPath = data[1];
                 string secondPath = data[2];
@@ -177,7 +276,7 @@ namespace BashSoft
             {
                 IOManager.TraverseDirectory(0);
             }
-            else if(data.Length == 2)
+            else if (data.Length == 2)
             {
                 int depth;
                 bool hasParsed = int.TryParse(data[1], out depth);
@@ -214,7 +313,7 @@ namespace BashSoft
             }
             else
             {
-                DisplayInvalidCommandMessage(input);    
+                DisplayInvalidCommandMessage(input);
             }
         }
 

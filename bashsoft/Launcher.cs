@@ -11,9 +11,9 @@ namespace BashSoft
         static void Main(string[] args)
         {
             ////IOManager.TraverseDirectory(@"D:\Torrents");
-            //Data.InitializeData();
-            ////Data.GetAllStudentsFromCourse("Unity");
-            //Data.GetStudentScoresFromCourse("Unity", "Ivan");
+            //StudentsRepository.InitializeData();
+            ////StudentsRepository.GetAllStudentsFromCourse("Unity");
+            //StudentsRepository.GetStudentScoresFromCourse("Unity", "Ivan");
 
             //Tester.CompareContent(@"D:\test1.txt", @"D:\test2.txt");
 

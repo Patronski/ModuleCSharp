@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BashSoft
 {
-    public static class Data
+    public static class StudentsRepository
     {
 
         public static bool isDataInitialized = false;
@@ -66,7 +66,7 @@ namespace BashSoft
             }
 
             isDataInitialized = true;
-            OutputWriter.WriteMessageOnNewLine("Data read!");
+            OutputWriter.WriteMessageOnNewLine("StudentsRepository read!");
         }
 
         private static bool IsQueryForCoursePossible(string courseName)
@@ -120,6 +120,32 @@ namespace BashSoft
                 {
                     OutputWriter.PrintStudent(studentMarskEntry);
                 }
+            }
+        }
+
+        public static void FilterAndTake(string courseName, string givenFilter, int? studentsToTake = null)
+        {
+            if (IsQueryForCoursePossible(courseName))
+            {
+                if(studentsToTake == null)
+                {
+                    studentsToTake = studentsByCourse[courseName].Count;
+                }
+
+                RepositoryFilters.FilterAndTake(studentsByCourse[courseName], givenFilter, studentsToTake.Value);
+            }
+        }
+
+        public static void OrderAndTake(string courseName, string comparison, int? studentsToTake = null)
+        {
+            if (IsQueryForCoursePossible(courseName))
+            {
+                if (studentsToTake == null)
+                {
+                    studentsToTake = studentsByCourse[courseName].Count;
+                }
+
+                RepositorySorters.OrderAndTake(studentsByCourse[courseName], comparison, studentsToTake.Value);
             }
         }
     }
